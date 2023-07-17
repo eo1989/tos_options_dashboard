@@ -21,7 +21,7 @@ def prob_cone(stock_price:float, volatility:float, days_ahead:int, probability=0
 
 def get_prob(stock_price:float, strike_price:float, volatility:float, days_ahead:int, trading_periods:int=252) -> float:
 
-    if None or 0 not in (stock_price, strike_price, volatility, days_ahead):        
+    if 0 not in (stock_price, strike_price, volatility, days_ahead):        
 
         z_score = abs(stock_price - strike_price)/(stock_price * volatility * math.sqrt(days_ahead/trading_periods))
 
@@ -36,7 +36,7 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
 
         # price_ls = price_df['close'].tolist()
         # price_ls = price_ls[window:]
-        
+
         # if None not in (price_ls):
 
         # # Source: https://goodcalculators.com/historical-volatility-calculator/ 
@@ -48,7 +48,7 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
         #         ave_log_return = sum(log_stock_returns)/len(log_stock_returns)
         #     else:
         #         ave_log_return = 0
-            
+
         #     returns_diff = [(returns - ave_log_return)**2 for returns in log_stock_returns] 
 
         #     return math.sqrt(252) * math.sqrt(sum(returns_diff)/(len(returns_diff)-1))
@@ -65,10 +65,10 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
         log_co = (price_df['close'] / price_df['open']).apply(np.log)
 
         rs = 0.5 * log_hl**2 - (2*math.log(2)-1) * log_co**2
-        
+
         def f(v):
             return (trading_periods * v.mean())**0.5
-        
+
         result = rs.rolling(window=window, center=False).apply(func=f)
 
     elif estimator =='hodges_tompkins':
@@ -91,7 +91,7 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
 
         def f(v):
             return (trading_periods * v.mean())**0.5
-        
+
         result = rs.rolling(
             window=window,
             center=False
@@ -101,12 +101,12 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
         log_ho = (price_df['high'] / price_df['open']).apply(np.log)
         log_lo = (price_df['low'] / price_df['open']).apply(np.log)
         log_co = (price_df['close'] / price_df['open']).apply(np.log)
-        
+
         rs = log_ho * (log_ho - log_co) + log_lo * (log_lo - log_co)
 
         def f(v):
             return (trading_periods * v.mean())**0.5
-        
+
         result = rs.rolling(
             window=window,
             center=False
@@ -116,15 +116,15 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
         log_ho = (price_df['high'] / price_df['open']).apply(np.log)
         log_lo = (price_df['low'] / price_df['open']).apply(np.log)
         log_co = (price_df['close'] / price_df['open']).apply(np.log)
-        
+
         log_oc = (price_df['open'] / price_df['close'].shift(1)).apply(np.log)
         log_oc_sq = log_oc**2
-        
+
         log_cc = (price_df['close'] / price_df['close'].shift(1)).apply(np.log)
         log_cc_sq = log_cc**2
-        
+
         rs = log_ho * (log_ho - log_co) + log_lo * (log_lo - log_co)
-        
+
         close_vol = log_cc_sq.rolling(
             window=window,
             center=False
@@ -141,7 +141,4 @@ def get_hist_volatility(price_df, window=30, estimator='log_returns', trading_pe
         k = 0.34 / (1.34 + (window + 1) / (window - 1))
         result = (open_vol + k * close_vol + (1 - k) * window_rs).apply(np.sqrt) * math.sqrt(trading_periods)
 
-    if clean:
-        return result.dropna()
-    else:
-        return result
+    return result.dropna() if clean else result

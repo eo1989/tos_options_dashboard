@@ -4,13 +4,9 @@ from mysql.connector import Error # Insert new data in MYSQL DB
 
 # Import Functionality
 def db_connect(db_user, db_pass, db_name, db_url = 'localhost'):
-    connection = mysql.connector.connect(
-        host=db_url,
-        database=db_name,
-        user=db_user,
-        password=db_pass
+    return mysql.connector.connect(
+        host=db_url, database=db_name, user=db_user, password=db_pass
     )
-    return connection
 
 def sql_import(query, data, user, passwd, db_name):
     try: 
