@@ -74,14 +74,9 @@ def tos_load_price_hist(ticker_symbol:str, period=1, startDate=None, endDate=Non
     if apiKey is None:
             raise ValueError("TOS Option API Key is not defined.")
 
-    price_ls = []
-
     data = tos_get_price_hist(ticker_symbol, period=period, startDate=startDate, endDate=endDate, apiKey=apiKey)
 
-    for candle in data['candles']:
-        price_ls.append(candle['close'])
-
-    return price_ls
+    return [candle['close'] for candle in data['candles']]
 
 # TOS API call to get OTM option type (Call/Put)
 def tos_get_option_chain(ticker_symbol:str, contractType='ALL', rangeType='OTM', apiKey=None):
@@ -122,14 +117,11 @@ def tos_get_fundamental_data(ticker_symbol:str, apiKey=None, search='fundamental
                 'symbol':ticker_symbol,
                 'projection':search,               # Values: symbol-search, symbol-regex, desc-search, desc-regex, fundamental
                 }
-    
+
     # Make a request
     content = requests.get(url = endpoint, params = payload)
 
-    if raw:
-        return content
-    else:
-        return content.json() 
+    return content if raw else content.json() 
     
 
 
