@@ -1,5 +1,5 @@
-def create_pricelist(hist_price):
+def create_pricelist(hist_price: float | str) -> list[float | str]:
     output_ls = []
     for candle in hist_price['candles']:
-        output_ls.append(candle['close'])    
+        output_ls.append(candle['close'])
     return output_ls
